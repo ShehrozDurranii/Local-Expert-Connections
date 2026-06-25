@@ -1,0 +1,32 @@
+{
+  "name": "expertconnect",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ExpertConnect monorepo — Full-stack Next.js + Express.js application",
+  "scripts": {
+    "prepare": "husky",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "lint:frontend": "cd frontend && npx eslint app/ services/",
+    "lint:backend": "cd backend && npx eslint src/",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,yml,yaml,css}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,yml,yaml,css}\""
+  },
+  "lint-staged": {
+    "frontend/**/*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix --max-warnings=0"
+    ],
+    "backend/**/*.{js,jsx}": [
+      "prettier --write",
+      "eslint --fix --max-warnings=0"
+    ],
+    "*.{json,md,yml,yaml,css}": [
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.4"
+  }
+}
