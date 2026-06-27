@@ -4,6 +4,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth.routes');
 const profileRoutes = require('./routes/profile.routes');
 const notificationsRoutes = require('./routes/notifications.routes');
+const savedExpertsRoutes = require('./routes/saved-experts.routes');
 const requestRoutes = require('./routes/request.routes');
 
 const app = express();
@@ -16,6 +17,7 @@ app.get('/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/buyers', authRoutes);
 app.use('/api/buyers', profileRoutes);
 app.use('/api/buyers', notificationsRoutes);
+app.use('/api/buyers', savedExpertsRoutes);
 app.use('/api/requests', requestRoutes);
 
 module.exports = app;
