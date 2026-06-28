@@ -6,7 +6,10 @@ exports.getRequests = async (req, res) => {
 
 exports.createRequest = async (req, res) => {
   try {
-    const result = await service.create(req.body);
+    const result = await service.create({
+      ...req.body,
+      buyer_id: req.user.id,
+    });
 
     res.status(201).json(result);
     console.log(result);

@@ -1,5 +1,5 @@
 node_modules/
-backend/.env/
+backend/.env
 .env.local
 
 .next/

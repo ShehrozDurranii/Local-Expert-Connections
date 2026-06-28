@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const db = require('../config/database');
 
 exports.getAll = async () => {
@@ -6,8 +7,17 @@ exports.getAll = async () => {
 };
 
 exports.create = async (data) => {
-  const { id, buyer_id, city_id, category_id, description, budget, timeline, item_links, status } =
+  const { buyer_id, city_id, category_id, description, budget, timeline, item_links, status } =
     data;
+  const id = data.id || crypto.randomUUID();
+
+  let mysqlTimeline = timeline;
+  if (timeline) {
+    const d = new Date(timeline);
+    if (!isNaN(d.getTime())) {
+      mysqlTimeline = d.toISOString().slice(0, 19).replace('T', ' ');
+    }
+  }
 
   await db.query(
     `
@@ -32,7 +42,7 @@ exports.create = async (data) => {
       category_id,
       description,
       budget,
-      timeline,
+      mysqlTimeline,
       item_links,
       status || 'draft',
     ]

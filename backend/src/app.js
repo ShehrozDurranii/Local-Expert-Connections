@@ -5,6 +5,7 @@ const authRoutes = require('./routes/auth.routes');
 const profileRoutes = require('./routes/profile.routes');
 const notificationsRoutes = require('./routes/notifications.routes');
 const savedExpertsRoutes = require('./routes/saved-experts.routes');
+const offerRoutes = require('./routes/offer.routes');
 const requestRoutes = require('./routes/request.routes');
 
 const app = express();
@@ -18,6 +19,7 @@ app.use('/api/buyers', authRoutes);
 app.use('/api/buyers', profileRoutes);
 app.use('/api/buyers', notificationsRoutes);
 app.use('/api/buyers', savedExpertsRoutes);
+app.use('/api', offerRoutes);
 app.use('/api/requests', requestRoutes);
 
 module.exports = app;
