@@ -50,3 +50,33 @@ exports.cancelRequest = async (req, res) => {
     });
   }
 };
+
+exports.getBuyerRequests = async (req, res) => {
+  try {
+    const { buyerId } = req.params;
+
+    // Ownership check: buyer can only view their own requests
+    if (req.user.id !== buyerId) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have permission to access this resource',
+      });
+    }
+
+    const status = req.query.status || null;
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 10, 1), 50);
+
+    const result = await service.getBuyerRequests(buyerId, status, page, limit);
+
+    return res.status(200).json({
+      success: true,
+      ...result,
+    });
+  } catch (error) {
+    return res.status(error.status || 500).json({
+      success: false,
+      message: error.message || 'Internal server error',
+    });
+  }
+};
