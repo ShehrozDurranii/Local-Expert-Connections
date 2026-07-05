@@ -37,6 +37,14 @@ exports.register = async (data) => {
     errors.push({ field: 'email/phone', message: 'At least one of email or phone is required' });
   }
 
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.push({ field: 'email', message: 'Email must be a valid email address' });
+  }
+
+  if (phone && !/^\+92[0-9]{10}$/.test(phone)) {
+    errors.push({ field: 'phone', message: 'Phone number must match format +92XXXXXXXXXX' });
+  }
+
   if (!password || password.length < 8) {
     errors.push({ field: 'password', message: 'Password must be at least 8 characters' });
   }

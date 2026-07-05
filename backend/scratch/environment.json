@@ -1,0 +1,102 @@
+{
+  "id": "167985b8-2455-411b-b55b-58ec3ecc21d0",
+  "name": "Local Expert-Connect Env",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:5000",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "jwtToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijk1YjQ4ZjA0LWZjMTMtNDU2My05NmEwLTJkMDFjNmQ4YjlkMyIsInJvbGUiOiJidXllciIsImlhdCI6MTc4MzI0NTczNCwiZXhwIjoxNzgzODUwNTM0fQ.Etm9gC2q37gdufJuaptVvSySJSHDLjeBTMQ4DG0C6tU",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "buyerId",
+      "value": "95b48f04-fc13-4563-96a0-2d01c6d8b9d3",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "expertId",
+      "value": "",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "requestId",
+      "value": "21a6f34b-fb8e-4b58-a1d6-75b832fa7dc7",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "offerId",
+      "value": "",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "reviewId",
+      "value": "",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "cityId",
+      "value": "3b687684-1287-434c-870a-5c5b414a67cc",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "categoryId",
+      "value": "393a36a3-5ef8-4290-be33-85766506ecd6",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "tempRegisterPhone",
+      "value": "+925418452837",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "tempRegisterEmail",
+      "value": "qa.buyer.450847@mail.com",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "tempInvalidPhone",
+      "value": "0300774876",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "tempInvalidEmail",
+      "value": "bad.phone.774876@mail.com",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "testOfferIdAccept",
+      "value": "110e8400-e29b-41d4-a716-446655440033",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "testOfferIdDecline",
+      "value": "110e8400-e29b-41d4-a716-446655440055",
+      "type": "any",
+      "enabled": true
+    },
+    {
+      "key": "testOrderIdFund",
+      "value": "e2d12163-9aa8-4cb7-a22a-b4bfd05b7e7f",
+      "type": "any",
+      "enabled": true
+    }
+  ]
+}

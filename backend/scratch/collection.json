@@ -1,0 +1,4498 @@
+{
+  "info": {
+    "_postman_id": "d54b4482-f8cf-49e6-9eb7-287012eabf35",
+    "name": "Local Expert-Connect",
+    "description": "Postman Collection for verifying the Local Expert-Connect Final Year Project (FYP) API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "createdAt": "2026-07-03T16:12:18.000Z",
+    "updatedAt": "2026-07-03T16:12:18.000Z",
+    "lastUpdatedBy": "50436078",
+    "uid": "50436078-d54b4482-f8cf-49e6-9eb7-287012eabf35"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register Buyer - Positive (Email + Phone)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "const randomNum = Math.floor(1000000000 + Math.random() * 9000000000);",
+                  "pm.environment.set(\"tempRegisterPhone\", \"+92\" + randomNum);",
+                  "const randomEmail = \"qa.buyer.\" + Math.floor(Math.random() * 1000000) + \"@mail.com\";",
+                  "pm.environment.set(\"tempRegisterEmail\", randomEmail);"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response is successful and contains valid data schema\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.buyer_id).to.be.a(\"string\");",
+                  "    pm.expect(jsonData.data.token).to.be.a(\"string\");",
+                  "    pm.expect(jsonData.data.expires_in).to.equal(\"7d\");",
+                  "    ",
+                  "    // Save to environment variables",
+                  "    pm.environment.set(\"buyerId\", jsonData.data.buyer_id);",
+                  "    pm.environment.set(\"jwtToken\", jsonData.data.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "bcd8d192-b335-bd74-4092-6473c42db196",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"QA Ahmed Khan\",\n  \"password\": \"SecurePass123!\",\n  \"email\": \"{{tempRegisterEmail}}\",\n  \"phone\": \"{{tempRegisterPhone}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/register",
+            "description": "Register a new buyer account with both email and phone provided. Validates status code is 201 and stores buyerId and jwtToken."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:14:12.000Z",
+          "updatedAt": "2026-07-03T16:14:12.000Z",
+          "uid": "50436078-bcd8d192-b335-bd74-4092-6473c42db196"
+        },
+        {
+          "name": "Register Buyer - Negative (Missing Name)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates validation failure on name\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Validation failed\");",
+                  "    const error = jsonData.errors.find(e => e.field === \"name\");",
+                  "    pm.expect(error).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "3a7e4976-0e5d-1d6c-52f2-c20eabed3e71",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"SecurePass123!\",\n  \"email\": \"missing.name@mail.com\",\n  \"phone\": \"+923001111111\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/register",
+            "description": "Register a new buyer account without providing a name. Expects status code 400."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:14:18.000Z",
+          "updatedAt": "2026-07-03T16:14:18.000Z",
+          "uid": "50436078-3a7e4976-0e5d-1d6c-52f2-c20eabed3e71"
+        },
+        {
+          "name": "Register Buyer - Negative (Short Password)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates validation failure on password\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Validation failed\");",
+                  "    const error = jsonData.errors.find(e => e.field === \"password\");",
+                  "    pm.expect(error).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "5327cc6f-457f-7c06-00d5-ac2e487e0e4e",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"QA Short Pass\",\n  \"password\": \"short\",\n  \"email\": \"short.pass@mail.com\",\n  \"phone\": \"+923002222222\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/register",
+            "description": "Register a new buyer account with a password shorter than 8 characters. Expects status code 400."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:14:24.000Z",
+          "updatedAt": "2026-07-03T16:14:24.000Z",
+          "uid": "50436078-5327cc6f-457f-7c06-00d5-ac2e487e0e4e"
+        },
+        {
+          "name": "Register Buyer - Negative (Missing Email and Phone)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates validation failure on email/phone requirement\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Validation failed\");",
+                  "    const error = jsonData.errors.find(e => e.field === \"email/phone\");",
+                  "    pm.expect(error).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "34f2b00f-5a80-6a24-641a-5c99d211b810",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"QA No Contact\",\n  \"password\": \"SecurePass123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/register",
+            "description": "Register a new buyer account without providing either email or phone. Expects status code 400."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:14:29.000Z",
+          "updatedAt": "2026-07-03T16:28:03.000Z",
+          "uid": "50436078-34f2b00f-5a80-6a24-641a-5c99d211b810"
+        },
+        {
+          "name": "Register Buyer - Negative (Invalid Phone Format)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "const randomNum = Math.floor(Math.random() * 1000000);",
+                  "pm.environment.set(\"tempInvalidPhone\", \"0300\" + randomNum);",
+                  "pm.environment.set(\"tempInvalidEmail\", \"bad.phone.\" + randomNum + \"@mail.com\");"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates validation failure on phone format\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Validation failed\");",
+                  "    const error = jsonData.errors.find(e => e.field === \"phone\");",
+                  "    pm.expect(error).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "97b90945-ef19-a054-366d-f84dfae93fee",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"QA Bad Phone\",\n  \"password\": \"SecurePass123!\",\n  \"email\": \"{{tempInvalidEmail}}\",\n  \"phone\": \"{{tempInvalidPhone}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/register",
+            "description": "Register a new buyer account with a phone number in an invalid format. Expects status code 400."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:14:36.000Z",
+          "updatedAt": "2026-07-03T16:28:10.000Z",
+          "uid": "50436078-97b90945-ef19-a054-366d-f84dfae93fee"
+        },
+        {
+          "name": "Register Buyer - Negative (Duplicate)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test(\"Response indicates conflict\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"already exists\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "718f6c25-16e0-9eed-7ed5-4ac44e3175be",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Duplicate Tester\",\n  \"password\": \"SecurePass123!\",\n  \"email\": \"{{tempRegisterEmail}}\",\n  \"phone\": \"{{tempRegisterPhone}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/register",
+            "description": "Register a new buyer account with email/phone that is already registered. Expects status code 409."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:14:42.000Z",
+          "updatedAt": "2026-07-03T16:28:13.000Z",
+          "uid": "50436078-718f6c25-16e0-9eed-7ed5-4ac44e3175be"
+        },
+        {
+          "name": "Login Buyer - Positive (Email)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is successful and contains valid data\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.buyer_id).to.be.a(\"string\");",
+                  "    pm.expect(jsonData.data.token).to.be.a(\"string\");",
+                  "    pm.expect(jsonData.data.expires_in).to.equal(\"7d\");",
+                  "    ",
+                  "    // Save to environment variables",
+                  "    pm.environment.set(\"jwtToken\", jsonData.data.token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "15175527-03b0-c41c-21c4-a0e5494f7041",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{tempRegisterEmail}}\",\n  \"password\": \"SecurePass123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/login",
+            "description": "Login using email and password. Validates status code 200 and saves jwtToken."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:33:23.000Z",
+          "updatedAt": "2026-07-03T16:33:23.000Z",
+          "uid": "50436078-15175527-03b0-c41c-21c4-a0e5494f7041"
+        },
+        {
+          "name": "Login Buyer - Positive (Phone)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is successful and contains valid data\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.buyer_id).to.be.a(\"string\");",
+                  "    pm.expect(jsonData.data.token).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "4efcaecd-5653-0d9b-f1ef-8489575dcf57",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{tempRegisterPhone}}\",\n  \"password\": \"SecurePass123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/login",
+            "description": "Login using phone number and password. Validates status code 200."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:33:28.000Z",
+          "updatedAt": "2026-07-03T16:33:28.000Z",
+          "uid": "50436078-4efcaecd-5653-0d9b-f1ef-8489575dcf57"
+        },
+        {
+          "name": "Login Buyer - Negative (Invalid Password)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response indicates invalid credentials\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Invalid email or password\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "c09666b3-6ddf-5c96-8822-ef74efad332b",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{tempRegisterEmail}}\",\n  \"password\": \"WrongPassword!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/login",
+            "description": "Attempt login with an incorrect password. Expects 401."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:33:31.000Z",
+          "updatedAt": "2026-07-03T16:33:31.000Z",
+          "uid": "50436078-c09666b3-6ddf-5c96-8822-ef74efad332b"
+        },
+        {
+          "name": "Login Buyer - Negative (Non-existent Account)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response indicates invalid credentials\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Invalid email or password\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "50e5fcb6-6a20-7bfb-cc1a-808c357937f8",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"doesnotexist.buyer@mail.com\",\n  \"password\": \"SecurePass123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/login",
+            "description": "Attempt login with a non-existent email address. Expects 401."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:33:33.000Z",
+          "updatedAt": "2026-07-03T16:33:33.000Z",
+          "uid": "50436078-50e5fcb6-6a20-7bfb-cc1a-808c357937f8"
+        },
+        {
+          "name": "Login Buyer - Negative (Missing Password)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates validation failure on password\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Password is required\");",
+                  "    const error = jsonData.errors.find(e => e.field === \"password\");",
+                  "    pm.expect(error).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "fb53703a-d729-eeb7-5b18-e857a7f8320c",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{tempRegisterEmail}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/login",
+            "description": "Attempt login without providing password. Expects 400."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:33:37.000Z",
+          "updatedAt": "2026-07-03T16:33:37.000Z",
+          "uid": "50436078-fb53703a-d729-eeb7-5b18-e857a7f8320c"
+        },
+        {
+          "name": "Login Buyer - Negative (Suspended Account)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates suspended account\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"suspended. Contact support.\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "6b35d8b9-6988-54f6-00b2-3d9837ec58cb",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"suspended.buyer@mail.com\",\n  \"password\": \"SecurePass123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/login",
+            "description": "Attempt login with a suspended account. Expects 403."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:33:39.000Z",
+          "updatedAt": "2026-07-03T16:33:39.000Z",
+          "uid": "50436078-6b35d8b9-6988-54f6-00b2-3d9837ec58cb"
+        }
+      ],
+      "id": "3b96dd45-2407-47fd-8a38-2964de62ca05",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-03T16:33:39.000Z",
+      "uid": "50436078-3b96dd45-2407-47fd-8a38-2964de62ca05"
+    },
+    {
+      "name": "Buyer Profile",
+      "item": [
+        {
+          "name": "Get Profile - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response contains valid profile data\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.buyer_id).to.equal(pm.environment.get(\"buyerId\"));",
+                  "    pm.expect(jsonData.data.name).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "0646d4a5-c94a-6b7e-3317-6fda100a356f",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/profile",
+            "description": "Get buyer profile using valid JWT token and buyerId. Expects status code 200."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:38:36.000Z",
+          "updatedAt": "2026-07-03T16:38:36.000Z",
+          "uid": "50436078-0646d4a5-c94a-6b7e-3317-6fda100a356f"
+        },
+        {
+          "name": "Get Profile - Negative (Unauthorized)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response indicates unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"token is required\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "59a64b63-73ed-9343-a879-2127347ad60f",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/profile",
+            "description": "Attempt fetching profile without JWT token. Expects status code 401."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:38:41.000Z",
+          "updatedAt": "2026-07-03T16:40:36.000Z",
+          "uid": "50436078-59a64b63-73ed-9343-a879-2127347ad60f"
+        },
+        {
+          "name": "Get Profile - Negative (Forbidden)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden access\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"permission to access\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "7a40ddd2-df8e-00f3-1f04-683c31f57670",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/11111111-2222-3333-4444-555555555555/profile",
+            "description": "Attempt fetching another buyer's profile. Expects status code 403."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:38:45.000Z",
+          "updatedAt": "2026-07-03T16:38:45.000Z",
+          "uid": "50436078-7a40ddd2-df8e-00f3-1f04-683c31f57670"
+        },
+        {
+          "name": "Update Profile - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response indicates profile updated successfully\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.contain(\"updated successfully\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "e9165d6a-1ea2-9c64-8dfd-d46250386b43",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"QA Updated Name\",\n  \"languages\": \"en,ur\",\n  \"contact_preferences\": \"email,push\",\n  \"photo_url\": \"https://example.com/avatar.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/profile",
+            "description": "Perform partial update on the buyer's profile info. Expects status code 200."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:42:44.000Z",
+          "updatedAt": "2026-07-03T16:42:44.000Z",
+          "uid": "50436078-e9165d6a-1ea2-9c64-8dfd-d46250386b43"
+        },
+        {
+          "name": "Update Profile - Negative (Short Name)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates validation failure on name\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Validation failed\");",
+                  "    const error = jsonData.errors.find(e => e.field === \"name\");",
+                  "    pm.expect(error).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "fac0ba34-fd10-3f5a-472f-c99dc86bcf5d",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/profile",
+            "description": "Attempt profile update with name shorter than 2 characters. Expects status code 400."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:42:48.000Z",
+          "updatedAt": "2026-07-03T16:42:48.000Z",
+          "uid": "50436078-fac0ba34-fd10-3f5a-472f-c99dc86bcf5d"
+        },
+        {
+          "name": "Update Profile - Negative (Invalid Photo URL)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates validation failure on photo_url\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Validation failed\");",
+                  "    const error = jsonData.errors.find(e => e.field === \"photo_url\");",
+                  "    pm.expect(error).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "753eb3bf-539b-7757-6000-2fcd75caabd2",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"photo_url\": \"not-a-valid-url\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/profile",
+            "description": "Attempt profile update with malformed photo URL. Expects status code 400."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:42:55.000Z",
+          "updatedAt": "2026-07-03T16:42:55.000Z",
+          "uid": "50436078-753eb3bf-539b-7757-6000-2fcd75caabd2"
+        },
+        {
+          "name": "Update Profile - Negative (Unauthorized)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response indicates unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"token is required\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "02b9419c-951d-383e-f208-e46711031ba5",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"QA Updated Name\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/profile",
+            "description": "Attempt profile update without JWT token. Expects status code 401."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:42:59.000Z",
+          "updatedAt": "2026-07-03T16:42:59.000Z",
+          "uid": "50436078-02b9419c-951d-383e-f208-e46711031ba5"
+        },
+        {
+          "name": "Update Profile - Negative (Forbidden)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden access\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"permission to access\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "4471918a-3ff5-4ee6-cc9c-616e6194b6b2",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"QA Updated Name\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/11111111-2222-3333-4444-555555555555/profile",
+            "description": "Attempt profile update for another buyer. Expects status code 403."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:43:02.000Z",
+          "updatedAt": "2026-07-03T16:43:02.000Z",
+          "uid": "50436078-4471918a-3ff5-4ee6-cc9c-616e6194b6b2"
+        }
+      ],
+      "id": "89ace8bc-2d76-4eeb-9d92-43671f141c2c",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-03T16:43:02.000Z",
+      "uid": "50436078-89ace8bc-2d76-4eeb-9d92-43671f141c2c"
+    },
+    {
+      "name": "Buyer Request",
+      "item": [
+        {
+          "name": "Create Request - Positive",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response is success\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property(\"id\");",
+                  "    pm.environment.set(\"requestId\", jsonData.data.id);",
+                  "});"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "f392284a-a66b-bfc5-5b16-9134bbd30069",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"city_id\": \"{{cityId}}\",\n  \"category_id\": \"{{categoryId}}\",\n  \"description\": \"Please inspect and purchase the laptop at the provided link. Check for physical damage.\",\n  \"budget\": 55000.00,\n  \"timeline\": \"2026-03-01T00:00:00Z\",\n  \"item_links\": \"https://daraz.pk/product/67890\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/requests"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:09:17.000Z",
+          "updatedAt": "2026-07-05T09:09:17.000Z",
+          "uid": "50436078-f392284a-a66b-bfc5-5b16-9134bbd30069"
+        },
+        {
+          "name": "Create Request - Negative (Missing city_id)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Highlights city_id missing\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql(\"city_id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "84116219-2f71-f17a-0dc3-1b581ea07ea5",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category_id\": \"{{categoryId}}\",\n  \"description\": \"Please inspect and purchase the laptop at the provided link. Check for physical damage.\",\n  \"budget\": 55000.00,\n  \"timeline\": \"2026-03-01T00:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/requests"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:09:22.000Z",
+          "updatedAt": "2026-07-05T09:09:22.000Z",
+          "uid": "50436078-84116219-2f71-f17a-0dc3-1b581ea07ea5"
+        },
+        {
+          "name": "Create Request - Negative (Invalid category_id format)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Highlights category_id invalid\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql(\"category_id\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "365e5fb9-25dc-ee67-de9a-a2826c27e64e",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"city_id\": \"{{cityId}}\",\n  \"category_id\": \"not-a-uuid\",\n  \"description\": \"Please inspect and purchase the laptop at the provided link. Check for physical damage.\",\n  \"budget\": 55000.00,\n  \"timeline\": \"2026-03-01T00:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/requests"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:09:27.000Z",
+          "updatedAt": "2026-07-05T09:09:27.000Z",
+          "uid": "50436078-365e5fb9-25dc-ee67-de9a-a2826c27e64e"
+        },
+        {
+          "name": "Create Request - Negative (Short description)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Highlights description short\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql(\"description\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "6029e938-9492-6ecf-39b1-ab70fbef317b",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              },
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"city_id\": \"{{cityId}}\",\n  \"category_id\": \"{{categoryId}}\",\n  \"description\": \"Too short\",\n  \"budget\": 55000.00,\n  \"timeline\": \"2026-03-01T00:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/requests"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:09:32.000Z",
+          "updatedAt": "2026-07-05T09:09:32.000Z",
+          "uid": "50436078-6029e938-9492-6ecf-39b1-ab70fbef317b"
+        },
+        {
+          "name": "Create Request - Negative (Negative budget)",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Highlights budget negative\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql(\"budget\");",
+                  "});"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "9fc14e08-d35b-449f-53cc-fe7540f83272",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"city_id\": \"{{cityId}}\",\n  \"category_id\": \"{{categoryId}}\",\n  \"description\": \"Please inspect and purchase the laptop at the provided link. Check for physical damage.\",\n  \"budget\": -100.00,\n  \"timeline\": \"2026-03-01T00:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/requests"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:09:37.000Z",
+          "updatedAt": "2026-07-05T09:09:37.000Z",
+          "uid": "50436078-9fc14e08-d35b-449f-53cc-fe7540f83272"
+        },
+        {
+          "name": "Create Request - Negative (Invalid timeline)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Highlights timeline invalid\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql(\"timeline\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "3ff2cfc6-1bcc-229c-de58-07af8f61fac2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"city_id\": \"{{cityId}}\",\n  \"category_id\": \"{{categoryId}}\",\n  \"description\": \"Please inspect and purchase the laptop at the provided link. Check for physical damage.\",\n  \"budget\": 55000.00,\n  \"timeline\": \"not-a-date\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/requests"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:09:42.000Z",
+          "updatedAt": "2026-07-05T09:09:42.000Z",
+          "uid": "50436078-3ff2cfc6-1bcc-229c-de58-07af8f61fac2"
+        },
+        {
+          "name": "Create Request - Negative (Non-existent lookup city_id)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response says City lookup record not found\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include(\"City lookup\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "089b3f1a-1d35-4033-7c89-94d0acf85046",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"city_id\": \"00000000-0000-0000-0000-000000000000\",\n  \"category_id\": \"{{categoryId}}\",\n  \"description\": \"Please inspect and purchase the laptop at the provided link. Check for physical damage.\",\n  \"budget\": 55000.00,\n  \"timeline\": \"2026-03-01T00:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/requests"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:09:46.000Z",
+          "updatedAt": "2026-07-05T09:09:46.000Z",
+          "uid": "50436078-089b3f1a-1d35-4033-7c89-94d0acf85046"
+        },
+        {
+          "name": "Create Request - Negative (Unauthorized)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response is unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "ff2386e4-d0c1-aa65-7371-7a3cfa13030a",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"city_id\": \"{{cityId}}\",\n  \"category_id\": \"{{categoryId}}\",\n  \"description\": \"Please inspect and purchase the laptop at the provided link. Check for physical damage.\",\n  \"budget\": 55000.00,\n  \"timeline\": \"2026-03-01T00:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/requests"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:09:51.000Z",
+          "updatedAt": "2026-07-05T09:09:51.000Z",
+          "uid": "50436078-ff2386e4-d0c1-aa65-7371-7a3cfa13030a"
+        },
+        {
+          "name": "Get Request by ID - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response contains correct request details\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.id).to.eql(pm.environment.get(\"requestId\"));",
+                  "    pm.expect(jsonData.data.city).to.exist;",
+                  "    pm.expect(jsonData.data.category).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "e35ac4fe-a9b4-8a54-7f1e-5718834b91e3",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/{{requestId}}"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:17:28.000Z",
+          "updatedAt": "2026-07-05T09:17:28.000Z",
+          "uid": "50436078-e35ac4fe-a9b4-8a54-7f1e-5718834b91e3"
+        },
+        {
+          "name": "Get Request by ID - Negative (Invalid UUID format)",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Highlights invalid id parameter\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql(\"id\");",
+                  "});"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "974f8384-4803-b447-8419-ada5ccbb29a1",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/not-a-uuid"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:17:33.000Z",
+          "updatedAt": "2026-07-05T09:17:33.000Z",
+          "uid": "50436078-974f8384-4803-b447-8419-ada5ccbb29a1"
+        },
+        {
+          "name": "Get Request by ID - Negative (Non-existent request)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Response says request not found\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include(\"not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "a031bdee-1c20-0c68-28f3-284312b638d2",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/00000000-0000-0000-0000-000000000000"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:17:40.000Z",
+          "updatedAt": "2026-07-05T09:17:40.000Z",
+          "uid": "50436078-a031bdee-1c20-0c68-28f3-284312b638d2"
+        },
+        {
+          "name": "Get Request by ID - Negative (Unauthorized)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response is unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "f79aed53-f667-bfc2-37ed-57ef88cb5d17",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/{{requestId}}"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:17:45.000Z",
+          "updatedAt": "2026-07-05T09:17:45.000Z",
+          "uid": "50436078-f79aed53-f667-bfc2-37ed-57ef88cb5d17"
+        },
+        {
+          "name": "Cancel Request - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is success\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include(\"cancelled\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "76a30879-1a1a-dd92-e463-e4950b402ca2",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/{{requestId}}/cancel"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:20:32.000Z",
+          "updatedAt": "2026-07-05T09:20:32.000Z",
+          "uid": "50436078-76a30879-1a1a-dd92-e463-e4950b402ca2"
+        },
+        {
+          "name": "Cancel Request - Negative (Already cancelled)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates already cancelled\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include(\"Cannot cancel\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "e7665b41-c258-5640-cb45-3f5639eac36d",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/{{requestId}}/cancel"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:20:39.000Z",
+          "updatedAt": "2026-07-05T09:20:39.000Z",
+          "uid": "50436078-e7665b41-c258-5640-cb45-3f5639eac36d"
+        },
+        {
+          "name": "Cancel Request - Negative (Invalid UUID format)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Highlights invalid requestId parameter\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql(\"requestId\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "0c199751-35ca-0086-fc38-4e113910302e",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/not-a-uuid/cancel"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:20:44.000Z",
+          "updatedAt": "2026-07-05T09:20:44.000Z",
+          "uid": "50436078-0c199751-35ca-0086-fc38-4e113910302e"
+        },
+        {
+          "name": "Cancel Request - Negative (Non-existent request)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Response says request not found\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include(\"not found\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "d3f85006-d84f-a451-63fa-67bed2e5738a",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/00000000-0000-0000-0000-000000000000/cancel"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:20:52.000Z",
+          "updatedAt": "2026-07-05T09:20:58.000Z",
+          "uid": "50436078-d3f85006-d84f-a451-63fa-67bed2e5738a"
+        },
+        {
+          "name": "Cancel Request - Negative (Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include(\"permission\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "27f3ccbc-9f81-3f2c-ec03-7e5f01a59215",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/409bd80b-4729-447c-b404-8bf2b5e57445/cancel"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:21:05.000Z",
+          "updatedAt": "2026-07-05T09:21:05.000Z",
+          "uid": "50436078-27f3ccbc-9f81-3f2c-ec03-7e5f01a59215"
+        },
+        {
+          "name": "Cancel Request - Negative (Unauthorized)",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response is unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "});"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "c207ebbd-cfc8-4efd-9c53-64db6031d3ab",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/{{requestId}}/cancel"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:21:11.000Z",
+          "updatedAt": "2026-07-05T09:21:11.000Z",
+          "uid": "50436078-c207ebbd-cfc8-4efd-9c53-64db6031d3ab"
+        },
+        {
+          "name": "Get Buyer Requests - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is paginated list\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "    pm.expect(jsonData.pagination).to.have.property(\"page\");",
+                  "    pm.expect(jsonData.pagination).to.have.property(\"total\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "481426b2-ab4a-770b-78c7-6345190ea3dd",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/requests?page=1&limit=10"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:29:56.000Z",
+          "updatedAt": "2026-07-05T09:29:56.000Z",
+          "uid": "50436078-481426b2-ab4a-770b-78c7-6345190ea3dd"
+        },
+        {
+          "name": "Get Buyer Requests - Negative (Invalid UUID format)",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Highlights invalid buyerId parameter\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql(\"buyerId\");",
+                  "});"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "cb82ffd8-3cce-9f08-7ad3-e90d5549b605",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/buyers/not-a-uuid/requests"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:30:03.000Z",
+          "updatedAt": "2026-07-05T09:30:03.000Z",
+          "uid": "50436078-cb82ffd8-3cce-9f08-7ad3-e90d5549b605"
+        },
+        {
+          "name": "Get Buyer Requests - Negative (Invalid status query)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Highlights invalid status parameter\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql(\"status\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "4c90c374-839f-17d5-b3de-b79ec40b7c4d",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/requests?status=invalid"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:30:09.000Z",
+          "updatedAt": "2026-07-05T09:30:09.000Z",
+          "uid": "50436078-4c90c374-839f-17d5-b3de-b79ec40b7c4d"
+        },
+        {
+          "name": "Get Buyer Requests - Negative (Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden access\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include(\"permission\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "43d53a71-e579-0dad-0ebb-ffef5ee3b03c",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/buyers/11111111-2222-3333-4444-555555555555/requests"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:30:15.000Z",
+          "updatedAt": "2026-07-05T09:30:15.000Z",
+          "uid": "50436078-43d53a71-e579-0dad-0ebb-ffef5ee3b03c"
+        },
+        {
+          "name": "Get Buyer Requests - Negative (Unauthorized)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response is unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "31942702-2ab1-dbac-f493-0848e9cdea42",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/requests"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:30:22.000Z",
+          "updatedAt": "2026-07-05T09:30:22.000Z",
+          "uid": "50436078-31942702-2ab1-dbac-f493-0848e9cdea42"
+        }
+      ],
+      "id": "be5c5875-7ac7-431f-8262-12f62bcf39f8",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-05T09:30:22.000Z",
+      "uid": "50436078-be5c5875-7ac7-431f-8262-12f62bcf39f8"
+    },
+    {
+      "name": "Offers",
+      "item": [
+        {
+          "name": "Get Offers - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Returns list of offers\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "    pm.expect(jsonData.data.length).to.be.at.least(2);",
+                  "    const offer1 = jsonData.data.find(o => o.price === 45000);",
+                  "    pm.expect(offer1).to.exist;",
+                  "    pm.environment.set(\"testOfferIdAccept\", offer1.id);",
+                  "    pm.environment.set(\"testOfferIdDecline\", \"110e8400-e29b-41d4-a716-446655440055\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "a9cd878c-90e3-7903-7d68-cea06478e9a8",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/550e8400-e29b-41d4-a716-446655440022/offers"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:40:02.000Z",
+          "updatedAt": "2026-07-05T09:47:30.000Z",
+          "uid": "50436078-a9cd878c-90e3-7903-7d68-cea06478e9a8"
+        },
+        {
+          "name": "Get Offers - Negative (Invalid UUID format)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Highlights invalid requestId parameter\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql(\"requestId\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "af9d8bd0-6d7c-f5c5-8934-bedb65df3520",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/not-a-uuid/offers"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:40:06.000Z",
+          "updatedAt": "2026-07-05T09:40:06.000Z",
+          "uid": "50436078-af9d8bd0-6d7c-f5c5-8934-bedb65df3520"
+        },
+        {
+          "name": "Get Offers - Negative (Non-existent request)",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Response says request not found\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include(\"not found\");",
+                  "});"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "0f6ba563-cd87-9554-1e32-16d6b97ed0e7",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/00000000-0000-0000-0000-000000000000/offers"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:40:13.000Z",
+          "updatedAt": "2026-07-05T09:40:13.000Z",
+          "uid": "50436078-0f6ba563-cd87-9554-1e32-16d6b97ed0e7"
+        },
+        {
+          "name": "Get Offers - Negative (Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include(\"permission\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "c226727f-ba81-ee1b-e8ae-3b37f0bd26e3",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/38cbe690-3fcc-4b63-a245-719114206b45/offers"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:40:16.000Z",
+          "updatedAt": "2026-07-05T09:40:16.000Z",
+          "uid": "50436078-c226727f-ba81-ee1b-e8ae-3b37f0bd26e3"
+        },
+        {
+          "name": "Get Offers - Negative (Unauthorized)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response is unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "fda8c720-55fd-7dc1-c28d-a945e167a1d4",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/requests/550e8400-e29b-41d4-a716-446655440022/offers"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:40:20.000Z",
+          "updatedAt": "2026-07-05T09:40:20.000Z",
+          "uid": "50436078-fda8c720-55fd-7dc1-c28d-a945e167a1d4"
+        },
+        {
+          "name": "Accept Offer - Positive",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Offer accepted and order created\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.be.an(\"object\");",
+                  "    pm.expect(jsonData.data.state).to.eql(\"accepted\");",
+                  "    pm.expect(jsonData.data.offer_id).to.eql(pm.environment.get(\"testOfferIdAccept\"));",
+                  "    pm.environment.set(\"testOrderIdFund\", jsonData.data.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "5cea0ae5-0351-554e-8a1e-cdf9af7e541c",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/offers/{{testOfferIdAccept}}/accept"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:42:30.000Z",
+          "updatedAt": "2026-07-05T09:42:30.000Z",
+          "uid": "50436078-5cea0ae5-0351-554e-8a1e-cdf9af7e541c"
+        },
+        {
+          "name": "Accept Offer - Negative (Already accepted)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates offer already processed\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include(\"already accepted\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "a3d3c33a-7ea3-0293-e83c-bfa822c1e6f3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/offers/{{testOfferIdAccept}}/accept"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:42:36.000Z",
+          "updatedAt": "2026-07-05T09:42:39.000Z",
+          "uid": "50436078-a3d3c33a-7ea3-0293-e83c-bfa822c1e6f3"
+        },
+        {
+          "name": "Accept Offer - Negative (Invalid UUID format)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Highlights invalid offerId parameter\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql(\"offerId\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "1869b3d7-5168-7e51-5755-0fca81d309cf",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/offers/not-a-uuid/accept"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:42:42.000Z",
+          "updatedAt": "2026-07-05T09:42:42.000Z",
+          "uid": "50436078-1869b3d7-5168-7e51-5755-0fca81d309cf"
+        },
+        {
+          "name": "Accept Offer - Negative (Non-existent offer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Response says offer not found\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include(\"not found\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "dc97c891-fa39-0d05-5465-cb553f1b3a4d",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/offers/00000000-0000-0000-0000-000000000000/accept"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:42:46.000Z",
+          "updatedAt": "2026-07-05T09:42:46.000Z",
+          "uid": "50436078-dc97c891-fa39-0d05-5465-cb553f1b3a4d"
+        },
+        {
+          "name": "Accept Offer - Negative (Forbidden)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include(\"permission\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "9861590f-1bd3-405b-c205-647800322701",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/offers/ae5de4a1-ffc4-42c4-9a65-debbb455953e/accept"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:42:49.000Z",
+          "updatedAt": "2026-07-05T09:42:49.000Z",
+          "uid": "50436078-9861590f-1bd3-405b-c205-647800322701"
+        },
+        {
+          "name": "Accept Offer - Negative (Unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response is unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "8a9c919b-4db7-c954-8bc9-8847bc11204b",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/offers/{{testOfferIdAccept}}/accept"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:42:52.000Z",
+          "updatedAt": "2026-07-05T09:42:52.000Z",
+          "uid": "50436078-8a9c919b-4db7-c954-8bc9-8847bc11204b"
+        },
+        {
+          "name": "Decline Offer - Positive",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Offer declined successfully\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include(\"declined\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "a4c254e5-1f80-cfe0-d76b-8edf4368c286",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/offers/{{testOfferIdDecline}}/decline"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:45:44.000Z",
+          "updatedAt": "2026-07-05T09:45:44.000Z",
+          "uid": "50436078-a4c254e5-1f80-cfe0-d76b-8edf4368c286"
+        },
+        {
+          "name": "Decline Offer - Negative (Already declined)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates offer already processed\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include(\"already accepted\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "a64c324a-c120-aac8-ef63-0f30dcbf365e",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/offers/{{testOfferIdDecline}}/decline"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:45:47.000Z",
+          "updatedAt": "2026-07-05T09:45:51.000Z",
+          "uid": "50436078-a64c324a-c120-aac8-ef63-0f30dcbf365e"
+        },
+        {
+          "name": "Decline Offer - Negative (Invalid UUID format)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Highlights invalid offerId parameter\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql(\"offerId\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "4c908920-e7ac-d395-d512-97b6e32f1001",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/offers/not-a-uuid/decline"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:45:55.000Z",
+          "updatedAt": "2026-07-05T09:45:55.000Z",
+          "uid": "50436078-4c908920-e7ac-d395-d512-97b6e32f1001"
+        },
+        {
+          "name": "Decline Offer - Negative (Non-existent offer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Response says offer not found\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include(\"not found\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "aa42f83f-ee25-9a10-ba8f-f4dad9a27775",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/offers/00000000-0000-0000-0000-000000000000/decline"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:45:59.000Z",
+          "updatedAt": "2026-07-05T09:45:59.000Z",
+          "uid": "50436078-aa42f83f-ee25-9a10-ba8f-f4dad9a27775"
+        },
+        {
+          "name": "Decline Offer - Negative (Forbidden)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include(\"permission\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "143932ca-777d-1cd3-099b-c0041e0cfc53",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/offers/ae5de4a1-ffc4-42c4-9a65-debbb455953e/decline"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:46:02.000Z",
+          "updatedAt": "2026-07-05T09:46:02.000Z",
+          "uid": "50436078-143932ca-777d-1cd3-099b-c0041e0cfc53"
+        },
+        {
+          "name": "Decline Offer - Negative (Unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response is unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "83f86105-f8b4-6088-05e2-1f966b03061f",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": "{{baseUrl}}/api/offers/{{testOfferIdDecline}}/decline"
+          },
+          "response": [],
+          "createdAt": "2026-07-05T09:46:06.000Z",
+          "updatedAt": "2026-07-05T09:46:06.000Z",
+          "uid": "50436078-83f86105-f8b4-6088-05e2-1f966b03061f"
+        }
+      ],
+      "id": "8a1a43ff-468e-439c-9bf9-91b8b488f847",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-05T09:46:06.000Z",
+      "uid": "50436078-8a1a43ff-468e-439c-9bf9-91b8b488f847"
+    },
+    {
+      "name": "Orders",
+      "item": [],
+      "id": "b198038f-ae5c-4e03-bca9-08fafb9e895f",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-03T16:12:19.000Z",
+      "uid": "50436078-b198038f-ae5c-4e03-bca9-08fafb9e895f"
+    },
+    {
+      "name": "Payments",
+      "item": [],
+      "id": "68b64931-a436-476a-88ad-c505e57d904f",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-03T16:12:19.000Z",
+      "uid": "50436078-68b64931-a436-476a-88ad-c505e57d904f"
+    },
+    {
+      "name": "Milestones",
+      "item": [],
+      "id": "3cc8aeb5-d7ec-4ff5-aef6-d6af2329b702",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-03T16:12:19.000Z",
+      "uid": "50436078-3cc8aeb5-d7ec-4ff5-aef6-d6af2329b702"
+    },
+    {
+      "name": "Proof",
+      "item": [],
+      "id": "6401dff8-c05e-4801-abc2-e9927f4af994",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-03T16:12:19.000Z",
+      "uid": "50436078-6401dff8-c05e-4801-abc2-e9927f4af994"
+    },
+    {
+      "name": "Messages",
+      "item": [],
+      "id": "30e5224a-c345-41a0-8140-5b9b9c53610a",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-03T16:12:19.000Z",
+      "uid": "50436078-30e5224a-c345-41a0-8140-5b9b9c53610a"
+    },
+    {
+      "name": "Attachments",
+      "item": [],
+      "id": "4f3d1bca-be12-4da7-abec-f6415b2f18d6",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-03T16:12:19.000Z",
+      "uid": "50436078-4f3d1bca-be12-4da7-abec-f6415b2f18d6"
+    },
+    {
+      "name": "Reviews",
+      "item": [],
+      "id": "83ebb44e-5e46-481e-bdf6-1a8e2cdef2ca",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-03T16:12:19.000Z",
+      "uid": "50436078-83ebb44e-5e46-481e-bdf6-1a8e2cdef2ca"
+    },
+    {
+      "name": "Blocklist",
+      "item": [
+        {
+          "name": "Block User - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response indicates user blocked successfully\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.contain(\"blocked successfully\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "38903642-3bb4-2c7c-7b4b-3da970fcb0dd",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"blocked_user_id\": \"550e8400-e29b-41d4-a716-446655440099\",\n  \"blocked_role\": \"expert\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/blocklist",
+            "description": "Block an expert user. Expects status code 201."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:59:37.000Z",
+          "updatedAt": "2026-07-03T16:59:37.000Z",
+          "uid": "50436078-38903642-3bb4-2c7c-7b4b-3da970fcb0dd"
+        },
+        {
+          "name": "Block User - Negative (Block Self)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates self block error\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"cannot block yourself\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "2488fd54-9a5e-4426-5bf0-561f08e61d68",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"blocked_user_id\": \"{{buyerId}}\",\n  \"blocked_role\": \"buyer\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/blocklist",
+            "description": "Attempt blocking oneself. Expects status code 400."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:59:44.000Z",
+          "updatedAt": "2026-07-03T16:59:44.000Z",
+          "uid": "50436078-2488fd54-9a5e-4426-5bf0-561f08e61d68"
+        },
+        {
+          "name": "Block User - Negative (Invalid UUID)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates validation failure on blocked_user_id\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Validation failed\");",
+                  "    const error = jsonData.errors.find(e => e.field === \"blocked_user_id\");",
+                  "    pm.expect(error).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "06d67820-c4dd-bb2a-2386-e44804a14102",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"blocked_user_id\": \"not-a-uuid\",\n  \"blocked_role\": \"expert\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/blocklist",
+            "description": "Attempt blocking a user with invalid UUID format. Expects status code 400."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:59:50.000Z",
+          "updatedAt": "2026-07-03T16:59:50.000Z",
+          "uid": "50436078-06d67820-c4dd-bb2a-2386-e44804a14102"
+        },
+        {
+          "name": "Block User - Negative (Invalid Role)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates validation failure on blocked_role\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Validation failed\");",
+                  "    const error = jsonData.errors.find(e => e.field === \"blocked_role\");",
+                  "    pm.expect(error).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "e81defcd-ba18-99a9-ea9e-b787d1355736",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"blocked_user_id\": \"550e8400-e29b-41d4-a716-446655440099\",\n  \"blocked_role\": \"invalid_role\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/blocklist",
+            "description": "Attempt blocking a user with invalid role. Expects status code 400."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:59:55.000Z",
+          "updatedAt": "2026-07-03T16:59:55.000Z",
+          "uid": "50436078-e81defcd-ba18-99a9-ea9e-b787d1355736"
+        },
+        {
+          "name": "Block User - Negative (Duplicate)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test(\"Response indicates duplicate block\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"already in your blocklist\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "050c0bfa-401c-4161-3df6-67edb9afdf0b",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"blocked_user_id\": \"550e8400-e29b-41d4-a716-446655440099\",\n  \"blocked_role\": \"expert\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/blocklist",
+            "description": "Attempt blocking same user again. Expects status code 409."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T17:00:05.000Z",
+          "updatedAt": "2026-07-03T17:00:05.000Z",
+          "uid": "50436078-050c0bfa-401c-4161-3df6-67edb9afdf0b"
+        },
+        {
+          "name": "Block User - Negative (Unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response indicates unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"token is required\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "bc8a10df-958e-7c5d-d596-ede618641b5d",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"blocked_user_id\": \"550e8400-e29b-41d4-a716-446655440099\",\n  \"blocked_role\": \"expert\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/blocklist",
+            "description": "Attempt blocking a user without JWT token. Expects status code 401."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T17:00:11.000Z",
+          "updatedAt": "2026-07-03T17:00:11.000Z",
+          "uid": "50436078-bc8a10df-958e-7c5d-d596-ede618641b5d"
+        },
+        {
+          "name": "Block User - Negative (Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden access\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"permission to access\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "94c401a1-faa3-de40-e19b-48245f5b469a",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"blocked_user_id\": \"550e8400-e29b-41d4-a716-446655440099\",\n  \"blocked_role\": \"expert\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/11111111-2222-3333-4444-555555555555/blocklist",
+            "description": "Attempt blocking a user for another buyer. Expects status code 403."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T17:00:19.000Z",
+          "updatedAt": "2026-07-03T17:00:19.000Z",
+          "uid": "50436078-94c401a1-faa3-de40-e19b-48245f5b469a"
+        },
+        {
+          "name": "Unblock User - Positive",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response indicates user unblocked successfully\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.contain(\"unblocked successfully\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "2cf1dd19-c741-b191-096c-0f1e725f673b",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/blocklist/550e8400-e29b-41d4-a716-446655440099",
+            "description": "Unblock a user. Expects status code 200."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T17:02:47.000Z",
+          "updatedAt": "2026-07-03T17:02:47.000Z",
+          "uid": "50436078-2cf1dd19-c741-b191-096c-0f1e725f673b"
+        },
+        {
+          "name": "Unblock User - Negative (Not Found)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Response indicates user not blocked\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"not found in your blocklist\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "7fdc994a-aba4-3fea-2c81-1838f76283e4",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/blocklist/550e8400-e29b-41d4-a716-446655440099",
+            "description": "Attempt unblocking a user who is not blocked. Expects status code 404."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T17:02:52.000Z",
+          "updatedAt": "2026-07-03T17:02:52.000Z",
+          "uid": "50436078-7fdc994a-aba4-3fea-2c81-1838f76283e4"
+        },
+        {
+          "name": "Unblock User - Negative (Unauthorized)",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response indicates unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"token is required\");",
+                  "});"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "20a967e6-8de8-6f71-fa34-32a75d65f764",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/blocklist/550e8400-e29b-41d4-a716-446655440099",
+            "description": "Attempt unblocking a user without JWT token. Expects status code 401."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T17:02:58.000Z",
+          "updatedAt": "2026-07-03T17:02:58.000Z",
+          "uid": "50436078-20a967e6-8de8-6f71-fa34-32a75d65f764"
+        },
+        {
+          "name": "Unblock User - Negative (Forbidden)",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden access\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"permission to access\");",
+                  "});"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "c5bdc8b8-5cae-8a16-c678-b33f996c305e",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/11111111-2222-3333-4444-555555555555/blocklist/550e8400-e29b-41d4-a716-446655440099",
+            "description": "Attempt unblocking user blocklist of another buyer. Expects status code 403."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T17:06:30.000Z",
+          "updatedAt": "2026-07-03T17:06:30.000Z",
+          "uid": "50436078-c5bdc8b8-5cae-8a16-c678-b33f996c305e"
+        },
+        {
+          "name": "Get Blocklist - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response contains blocklist data list\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "dc94a736-fa80-87cc-6e44-bfa6cf6e13a8",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/blocklist",
+            "description": "Get buyer's blocklist. Expects status code 200."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T17:10:50.000Z",
+          "updatedAt": "2026-07-03T17:10:50.000Z",
+          "uid": "50436078-dc94a736-fa80-87cc-6e44-bfa6cf6e13a8"
+        },
+        {
+          "name": "Get Blocklist - Negative (Unauthorized)",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response indicates unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"token is required\");",
+                  "});"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "f6cc5daf-fe92-3999-47a0-85f18e0561ac",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/blocklist",
+            "description": "Attempt getting buyer's blocklist without JWT token. Expects status code 401."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T17:10:56.000Z",
+          "updatedAt": "2026-07-03T17:10:56.000Z",
+          "uid": "50436078-f6cc5daf-fe92-3999-47a0-85f18e0561ac"
+        },
+        {
+          "name": "Get Blocklist - Negative (Forbidden)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden access\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"permission to access\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "7000fdcf-4421-45e2-416e-46318f9916e2",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/11111111-2222-3333-4444-555555555555/blocklist",
+            "description": "Attempt getting blocklist of another buyer. Expects status code 403."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T17:11:00.000Z",
+          "updatedAt": "2026-07-03T17:11:00.000Z",
+          "uid": "50436078-7000fdcf-4421-45e2-416e-46318f9916e2"
+        }
+      ],
+      "id": "9ae7393d-c76a-45a9-b878-d0e7426b75c5",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-03T17:11:00.000Z",
+      "uid": "50436078-9ae7393d-c76a-45a9-b878-d0e7426b75c5"
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "File Report - Positive",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"550e8400-e29b-41d4-a716-446655440099\",\n  \"reported_user_id\": \"ca9a80ff-0b83-4dca-975d-6c10c20808d9\",\n  \"reported_role\": \"expert\",\n  \"category\": \"fake_proof\",\n  \"evidence_notes\": \"QA test - proof photos appear to be downloaded from Google Images.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reports"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response indicates report submitted', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('submitted');",
+                  "});",
+                  "pm.test('Response data has report fields', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data.status).to.eql('open');",
+                  "    pm.expect(jsonData.data.category).to.eql('fake_proof');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "File Report - Negative (Invalid Order UUID)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"not-a-uuid\",\n  \"reported_user_id\": \"ca9a80ff-0b83-4dca-975d-6c10c20808d9\",\n  \"reported_role\": \"expert\",\n  \"category\": \"fraud\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reports"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Validation error on order_id', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql('order_id');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "File Report - Negative (Invalid Role)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"550e8400-e29b-41d4-a716-446655440099\",\n  \"reported_user_id\": \"ca9a80ff-0b83-4dca-975d-6c10c20808d9\",\n  \"reported_role\": \"admin\",\n  \"category\": \"fraud\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reports"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Validation error on reported_role', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql('reported_role');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "File Report - Negative (Invalid Category)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"550e8400-e29b-41d4-a716-446655440099\",\n  \"reported_user_id\": \"ca9a80ff-0b83-4dca-975d-6c10c20808d9\",\n  \"reported_role\": \"expert\",\n  \"category\": \"spam\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reports"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Validation error on category', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.errors[0].field).to.eql('category');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "File Report - Negative (Non-existent Order)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"00000000-0000-0000-0000-000000000000\",\n  \"reported_user_id\": \"ca9a80ff-0b83-4dca-975d-6c10c20808d9\",\n  \"reported_role\": \"expert\",\n  \"category\": \"fraud\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reports"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Response says order not found', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.include('order not found');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "File Report - Negative (Unauthorized)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"550e8400-e29b-41d4-a716-446655440099\",\n  \"reported_user_id\": \"ca9a80ff-0b83-4dca-975d-6c10c20808d9\",\n  \"reported_role\": \"expert\",\n  \"category\": \"fraud\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/reports"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 401', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test('Response indicates unauthorized', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "id": "66587975-ff38-4eb6-9ca8-f2aa0c4849e9",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-05T08:46:51.000Z",
+      "uid": "50436078-66587975-ff38-4eb6-9ca8-f2aa0c4849e9"
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get Notifications - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response contains list of notification preferences\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "ee07dc4a-7102-5d85-edfb-4ed54970c3d2",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/notifications",
+            "description": "Get notification preferences using valid JWT token and buyerId. Expects status code 200."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:46:05.000Z",
+          "updatedAt": "2026-07-03T16:46:05.000Z",
+          "uid": "50436078-ee07dc4a-7102-5d85-edfb-4ed54970c3d2"
+        },
+        {
+          "name": "Get Notifications - Negative (Unauthorized)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response indicates unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"token is required\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "2d401704-cecc-3dcd-2316-61b1fa879789",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/notifications",
+            "description": "Attempt fetching notification preferences without JWT token. Expects status code 401."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:46:09.000Z",
+          "updatedAt": "2026-07-03T16:46:09.000Z",
+          "uid": "50436078-2d401704-cecc-3dcd-2316-61b1fa879789"
+        },
+        {
+          "name": "Get Notifications - Negative (Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden access\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"permission to access\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "f2be6bbc-458d-5daa-8630-22ddb7a40103",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/11111111-2222-3333-4444-555555555555/notifications",
+            "description": "Attempt fetching notification preferences of another buyer. Expects status code 403."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:46:13.000Z",
+          "updatedAt": "2026-07-03T16:46:13.000Z",
+          "uid": "50436078-f2be6bbc-458d-5daa-8630-22ddb7a40103"
+        },
+        {
+          "name": "Update Notifications - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response indicates preferences updated successfully\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.contain(\"updated successfully\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "7eadf184-efd3-4741-62d0-5ce1445ca3ec",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"preferences\": [\n    {\n      \"notification_type\": \"offer_received\",\n      \"channel\": \"email\",\n      \"is_enabled\": true\n    },\n    {\n      \"notification_type\": \"payment_success\",\n      \"channel\": \"sms\",\n      \"is_enabled\": false\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/notifications",
+            "description": "Update buyer notification preferences. Expects status code 200."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:48:49.000Z",
+          "updatedAt": "2026-07-03T16:48:49.000Z",
+          "uid": "50436078-7eadf184-efd3-4741-62d0-5ce1445ca3ec"
+        },
+        {
+          "name": "Update Notifications - Negative (Disable Security Alert)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates validation failure on security_alert disabling\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Validation failed\");",
+                  "    const error = jsonData.errors.find(e => e.field === \"preferences[0].is_enabled\");",
+                  "    pm.expect(error).to.exist;",
+                  "    pm.expect(error.message).to.contain(\"Security alert notifications cannot be disabled\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "ea27d39f-e236-df96-e0f3-4c95ad30a11c",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"preferences\": [\n    {\n      \"notification_type\": \"security_alert\",\n      \"channel\": \"email\",\n      \"is_enabled\": false\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/notifications",
+            "description": "Attempt disabling security_alert notification. Expects status code 400."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:48:52.000Z",
+          "updatedAt": "2026-07-03T16:48:52.000Z",
+          "uid": "50436078-ea27d39f-e236-df96-e0f3-4c95ad30a11c"
+        },
+        {
+          "name": "Update Notifications - Negative (Invalid Event Type)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates validation failure on notification_type\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Validation failed\");",
+                  "    const error = jsonData.errors.find(e => e.field === \"preferences[0].notification_type\");",
+                  "    pm.expect(error).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "6db0b56a-4378-d3ec-84d8-414369070f6b",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"preferences\": [\n    {\n      \"notification_type\": \"invalid_event_type\",\n      \"channel\": \"email\",\n      \"is_enabled\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/notifications",
+            "description": "Attempt updating preferences with an invalid notification type. Expects status code 400."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:48:56.000Z",
+          "updatedAt": "2026-07-03T16:48:56.000Z",
+          "uid": "50436078-6db0b56a-4378-d3ec-84d8-414369070f6b"
+        },
+        {
+          "name": "Update Notifications - Negative (Unauthorized)",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response indicates unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"token is required\");",
+                  "});"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "a4ff0164-b9e3-3748-b879-e6d0b8119d40",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"preferences\": [\n    {\n      \"notification_type\": \"offer_received\",\n      \"channel\": \"email\",\n      \"is_enabled\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/notifications",
+            "description": "Attempt profile update without JWT token. Expects status code 401."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:49:06.000Z",
+          "updatedAt": "2026-07-03T16:49:06.000Z",
+          "uid": "50436078-a4ff0164-b9e3-3748-b879-e6d0b8119d40"
+        },
+        {
+          "name": "Update Notifications - Negative (Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden access\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"permission to access\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "cfd34206-9e14-0e96-988e-253759164bc0",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"preferences\": [\n    {\n      \"notification_type\": \"offer_received\",\n      \"channel\": \"email\",\n      \"is_enabled\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/11111111-2222-3333-4444-555555555555/notifications",
+            "description": "Attempt updating preferences for another buyer. Expects status code 403."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:49:11.000Z",
+          "updatedAt": "2026-07-03T16:49:11.000Z",
+          "uid": "50436078-cfd34206-9e14-0e96-988e-253759164bc0"
+        }
+      ],
+      "id": "74efc365-621b-4851-abe8-4006bf68dcb9",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-03T16:49:11.000Z",
+      "uid": "50436078-74efc365-621b-4851-abe8-4006bf68dcb9"
+    },
+    {
+      "name": "Saved Experts",
+      "item": [
+        {
+          "name": "Get Saved Experts - Positive",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response contains saved experts list and pagination\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
+                  "    pm.expect(jsonData.pagination).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "2ecdd7e7-cfdf-5ab1-0ece-24ae83fd01bf",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/saved-experts?page=1&limit=10",
+            "description": "Get the list of saved experts for this buyer. Expects status code 200."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:53:32.000Z",
+          "updatedAt": "2026-07-03T16:53:32.000Z",
+          "uid": "50436078-2ecdd7e7-cfdf-5ab1-0ece-24ae83fd01bf"
+        },
+        {
+          "name": "Get Saved Experts - Negative (Unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response indicates unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"token is required\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "7f86df0c-daed-e1d2-a65c-8e7098cfa692",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/saved-experts",
+            "description": "Attempt fetching saved experts list without JWT token. Expects status code 401."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:53:35.000Z",
+          "updatedAt": "2026-07-03T16:53:35.000Z",
+          "uid": "50436078-7f86df0c-daed-e1d2-a65c-8e7098cfa692"
+        },
+        {
+          "name": "Get Saved Experts - Negative (Forbidden)",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden access\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"permission to access\");",
+                  "});"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "a0d28d8c-668d-03f0-aefc-ea88f94ae3bd",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/11111111-2222-3333-4444-555555555555/saved-experts",
+            "description": "Attempt fetching saved experts list of another buyer. Expects status code 403."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:53:39.000Z",
+          "updatedAt": "2026-07-03T16:53:39.000Z",
+          "uid": "50436078-a0d28d8c-668d-03f0-aefc-ea88f94ae3bd"
+        },
+        {
+          "name": "Save Expert - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response indicates expert saved to bookmarks\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.contain(\"saved to bookmarks\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "08ec7b31-dc3b-fdd5-33f7-98998212e541",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expert_id\": \"550e8400-e29b-41d4-a716-446655440099\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/saved-experts",
+            "description": "Save an expert to bookmarks. Expects status code 201."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:55:55.000Z",
+          "updatedAt": "2026-07-03T16:55:55.000Z",
+          "uid": "50436078-08ec7b31-dc3b-fdd5-33f7-98998212e541"
+        },
+        {
+          "name": "Save Expert - Negative (Invalid UUID)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates validation failure on expert_id\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Validation failed\");",
+                  "    const error = jsonData.errors.find(e => e.field === \"expert_id\");",
+                  "    pm.expect(error).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "bd27476b-8a90-376c-9703-5063b5ca740f",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expert_id\": \"not-a-uuid\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/saved-experts",
+            "description": "Attempt saving an expert with invalid UUID format. Expects status code 400."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:55:59.000Z",
+          "updatedAt": "2026-07-03T16:55:59.000Z",
+          "uid": "50436078-bd27476b-8a90-376c-9703-5063b5ca740f"
+        },
+        {
+          "name": "Save Expert - Negative (Duplicate)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test(\"Response indicates duplicate error\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"already in saved list\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "d99ebc40-6bc0-b946-3225-81558d145832",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "Bearer {{jwtToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expert_id\": \"550e8400-e29b-41d4-a716-446655440099\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/saved-experts",
+            "description": "Attempt saving duplicate expert bookmark. Expects status code 409."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:56:03.000Z",
+          "updatedAt": "2026-07-03T16:56:03.000Z",
+          "uid": "50436078-d99ebc40-6bc0-b946-3225-81558d145832"
+        },
+        {
+          "name": "Save Expert - Negative (Unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response indicates unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"token is required\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "35e6786e-c078-1a66-20a5-1e63c7ff82e6",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expert_id\": \"550e8400-e29b-41d4-a716-446655440099\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/saved-experts",
+            "description": "Attempt saving an expert without JWT token. Expects status code 401."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:56:08.000Z",
+          "updatedAt": "2026-07-03T16:56:08.000Z",
+          "uid": "50436078-35e6786e-c078-1a66-20a5-1e63c7ff82e6"
+        },
+        {
+          "name": "Save Expert - Negative (Forbidden)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden access\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"permission to access\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "e7577859-9e0e-bde3-f813-23d0bfd36859",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expert_id\": \"550e8400-e29b-41d4-a716-446655440099\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/buyers/11111111-2222-3333-4444-555555555555/saved-experts",
+            "description": "Attempt saving an expert bookmark for another buyer. Expects status code 403."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:56:11.000Z",
+          "updatedAt": "2026-07-03T16:56:11.000Z",
+          "uid": "50436078-e7577859-9e0e-bde3-f813-23d0bfd36859"
+        },
+        {
+          "name": "Delete Saved Expert - Positive",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response indicates expert removed from saved list\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.contain(\"removed from saved list\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "6c888944-11cf-b107-5930-bc10103db00a",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/saved-experts/550e8400-e29b-41d4-a716-446655440099",
+            "description": "Delete saved expert bookmark. Expects status code 200."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:57:58.000Z",
+          "updatedAt": "2026-07-03T16:57:58.000Z",
+          "uid": "50436078-6c888944-11cf-b107-5930-bc10103db00a"
+        },
+        {
+          "name": "Delete Saved Expert - Negative (Invalid UUID)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Response indicates validation failure on expertId\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"Validation failed\");",
+                  "    const error = jsonData.errors.find(e => e.field === \"expertId\");",
+                  "    pm.expect(error).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "57ada1ac-42e3-19cd-0686-b35b909c0e4c",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/saved-experts/not-a-uuid",
+            "description": "Attempt deleting saved expert bookmark with invalid UUID format. Expects status code 400."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:58:00.000Z",
+          "updatedAt": "2026-07-03T16:58:00.000Z",
+          "uid": "50436078-57ada1ac-42e3-19cd-0686-b35b909c0e4c"
+        },
+        {
+          "name": "Delete Saved Expert - Negative (Not Found)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Response indicates bookmark not found\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"not found in saved list\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "3a6e6e8b-4b3f-756e-0afb-7fca31093491",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/saved-experts/550e8400-e29b-41d4-a716-446655440099",
+            "description": "Attempt deleting non-existent saved expert bookmark. Expects status code 404."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:58:04.000Z",
+          "updatedAt": "2026-07-03T16:58:04.000Z",
+          "uid": "50436078-3a6e6e8b-4b3f-756e-0afb-7fca31093491"
+        },
+        {
+          "name": "Delete Saved Expert - Negative (Unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response indicates unauthorized\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"token is required\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "f9f7b010-5ecf-1a42-adf7-e1acdd7a3092",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/saved-experts/550e8400-e29b-41d4-a716-446655440099",
+            "description": "Attempt deleting saved expert bookmark without JWT token. Expects status code 401."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:58:07.000Z",
+          "updatedAt": "2026-07-03T16:58:07.000Z",
+          "uid": "50436078-f9f7b010-5ecf-1a42-adf7-e1acdd7a3092"
+        },
+        {
+          "name": "Delete Saved Expert - Negative (Forbidden)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Response indicates forbidden access\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "    pm.expect(jsonData.message).to.contain(\"permission to access\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "c2179319-d50c-9757-6c3e-c24991f38d1a",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/11111111-2222-3333-4444-555555555555/saved-experts/550e8400-e29b-41d4-a716-446655440099",
+            "description": "Attempt deleting saved expert bookmark of another buyer. Expects status code 403."
+          },
+          "response": [],
+          "createdAt": "2026-07-03T16:58:10.000Z",
+          "updatedAt": "2026-07-03T16:58:10.000Z",
+          "uid": "50436078-c2179319-d50c-9757-6c3e-c24991f38d1a"
+        }
+      ],
+      "id": "8989b85f-1b3f-4dff-86e8-3c7da8a0c6f3",
+      "createdAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-03T16:58:10.000Z",
+      "uid": "50436078-8989b85f-1b3f-4dff-86e8-3c7da8a0c6f3"
+    }
+  ]
+}
