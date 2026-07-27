@@ -34,6 +34,16 @@ exports.uploadMiddleware = upload;
 exports.getOrderAttachments = async (req, res) => {
   try {
     const { orderId } = req.params;
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    if (!orderId || !UUID_REGEX.test(orderId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: [{ field: 'orderId', message: 'Must be a valid UUID' }],
+      });
+    }
+
     const attachments = await attachmentService.getOrderAttachments(req.user.id, orderId);
 
     return res.status(200).json({
@@ -53,6 +63,20 @@ exports.getOrderAttachments = async (req, res) => {
  * Upload a file attachment.
  */
 exports.uploadAttachment = async (req, res) => {
+  const { orderId } = req.params;
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  if (!orderId || !UUID_REGEX.test(orderId)) {
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    return res.status(400).json({
+      success: false,
+      message: 'Validation failed',
+      errors: [{ field: 'orderId', message: 'Must be a valid UUID' }],
+    });
+  }
+
   // If file was not processed by multer
   if (!req.file) {
     return res.status(400).json({

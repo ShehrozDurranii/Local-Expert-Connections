@@ -7,6 +7,16 @@ const messageService = require('../services/message.service');
 exports.getOrderMessages = async (req, res) => {
   try {
     const { orderId } = req.params;
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    if (!orderId || !UUID_REGEX.test(orderId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: [{ field: 'orderId', message: 'Must be a valid UUID' }],
+      });
+    }
+
     const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
     const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 20, 1), 100);
 
@@ -32,6 +42,15 @@ exports.sendMessage = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { content } = req.body;
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    if (!orderId || !UUID_REGEX.test(orderId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: [{ field: 'orderId', message: 'Must be a valid UUID' }],
+      });
+    }
 
     // Validate content
     if (!content || typeof content !== 'string' || !content.trim()) {

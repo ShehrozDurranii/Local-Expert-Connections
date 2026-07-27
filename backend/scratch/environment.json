@@ -10,13 +10,13 @@
     },
     {
       "key": "jwtToken",
-      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijk1YjQ4ZjA0LWZjMTMtNDU2My05NmEwLTJkMDFjNmQ4YjlkMyIsInJvbGUiOiJidXllciIsImlhdCI6MTc4MzI0NTczNCwiZXhwIjoxNzgzODUwNTM0fQ.Etm9gC2q37gdufJuaptVvSySJSHDLjeBTMQ4DG0C6tU",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImI5OTI4MjIzLTM0ZmMtNDFhZS04MTVjLWZiMmUyZTUyNTcxNiIsInJvbGUiOiJidXllciIsImlhdCI6MTc4NTE3Njk4NSwiZXhwIjoxNzg1NzgxNzg1fQ.LtSElQo01GmBdkE1Mhf8_eI5VofIWHfkoL7eT8n3RTU",
       "type": "any",
       "enabled": true
     },
     {
       "key": "buyerId",
-      "value": "95b48f04-fc13-4563-96a0-2d01c6d8b9d3",
+      "value": "b9928223-34fc-41ae-815c-fb2e2e525716",
       "type": "any",
       "enabled": true
     },
@@ -28,7 +28,7 @@
     },
     {
       "key": "requestId",
-      "value": "21a6f34b-fb8e-4b58-a1d6-75b832fa7dc7",
+      "value": "8b8a57c6-0593-41b7-ba3d-8dd403ed436a",
       "type": "any",
       "enabled": true
     },
@@ -58,43 +58,25 @@
     },
     {
       "key": "tempRegisterPhone",
-      "value": "+925418452837",
+      "value": "+925423351513",
       "type": "any",
       "enabled": true
     },
     {
       "key": "tempRegisterEmail",
-      "value": "qa.buyer.450847@mail.com",
+      "value": "qa.buyer.846675@mail.com",
       "type": "any",
       "enabled": true
     },
     {
       "key": "tempInvalidPhone",
-      "value": "0300774876",
+      "value": "03006452",
       "type": "any",
       "enabled": true
     },
     {
       "key": "tempInvalidEmail",
-      "value": "bad.phone.774876@mail.com",
-      "type": "any",
-      "enabled": true
-    },
-    {
-      "key": "testOfferIdAccept",
-      "value": "110e8400-e29b-41d4-a716-446655440033",
-      "type": "any",
-      "enabled": true
-    },
-    {
-      "key": "testOfferIdDecline",
-      "value": "110e8400-e29b-41d4-a716-446655440055",
-      "type": "any",
-      "enabled": true
-    },
-    {
-      "key": "testOrderIdFund",
-      "value": "e2d12163-9aa8-4cb7-a22a-b4bfd05b7e7f",
+      "value": "bad.phone.6452@mail.com",
       "type": "any",
       "enabled": true
     }

@@ -7,6 +7,16 @@ const proofService = require('../services/proof.service');
 exports.getProof = async (req, res) => {
   try {
     const { orderId } = req.params;
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    if (!orderId || !UUID_REGEX.test(orderId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: [{ field: 'orderId', message: 'Must be a valid UUID' }],
+      });
+    }
+
     const proof = await proofService.getProofByOrderId(req.user.id, orderId);
 
     return res.status(200).json({
@@ -28,6 +38,23 @@ exports.getProof = async (req, res) => {
 exports.approveProof = async (req, res) => {
   try {
     const { orderId, proofId } = req.params;
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    if (!orderId || !UUID_REGEX.test(orderId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: [{ field: 'orderId', message: 'Must be a valid UUID' }],
+      });
+    }
+    if (!proofId || !UUID_REGEX.test(proofId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: [{ field: 'proofId', message: 'Must be a valid UUID' }],
+      });
+    }
+
     await proofService.approveProof(req.user.id, orderId, proofId);
 
     return res.status(200).json({
@@ -50,6 +77,22 @@ exports.rejectProof = async (req, res) => {
   try {
     const { orderId, proofId } = req.params;
     const { rejection_reason } = req.body;
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    if (!orderId || !UUID_REGEX.test(orderId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: [{ field: 'orderId', message: 'Must be a valid UUID' }],
+      });
+    }
+    if (!proofId || !UUID_REGEX.test(proofId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: [{ field: 'proofId', message: 'Must be a valid UUID' }],
+      });
+    }
 
     // Validate rejection reason
     if (

@@ -7,6 +7,16 @@ const milestoneService = require('../services/milestone.service');
 exports.getOrderMilestones = async (req, res) => {
   try {
     const { orderId } = req.params;
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    if (!orderId || !UUID_REGEX.test(orderId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: [{ field: 'orderId', message: 'Must be a valid UUID' }],
+      });
+    }
+
     const milestones = await milestoneService.getOrderMilestones(req.user.id, orderId);
 
     return res.status(200).json({

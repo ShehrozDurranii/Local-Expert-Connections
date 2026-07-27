@@ -8,6 +8,15 @@ exports.fundEscrow = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { gateway_reference } = req.body;
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    if (!orderId || !UUID_REGEX.test(orderId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: [{ field: 'orderId', message: 'Must be a valid UUID' }],
+      });
+    }
 
     // Validate required field
     if (!gateway_reference || typeof gateway_reference !== 'string' || !gateway_reference.trim()) {
@@ -40,6 +49,16 @@ exports.fundEscrow = async (req, res) => {
 exports.getPayment = async (req, res) => {
   try {
     const { orderId } = req.params;
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    if (!orderId || !UUID_REGEX.test(orderId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: [{ field: 'orderId', message: 'Must be a valid UUID' }],
+      });
+    }
+
     const payment = await paymentService.getPayment(req.user.id, orderId);
 
     return res.status(200).json({

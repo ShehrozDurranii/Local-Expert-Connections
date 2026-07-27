@@ -1970,110 +1970,31 @@
       "item": [
         {
           "name": "Get Offers - Positive",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/requests/550e8400-e29b-41d4-a716-446655440022/offers"
+          },
           "event": [
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test(\"Returns list of offers\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.data).to.be.an(\"array\");",
-                  "    pm.expect(jsonData.data.length).to.be.at.least(2);",
-                  "    const offer1 = jsonData.data.find(o => o.price === 45000);",
-                  "    pm.expect(offer1).to.exist;",
-                  "    pm.environment.set(\"testOfferIdAccept\", offer1.id);",
-                  "    pm.environment.set(\"testOfferIdDecline\", \"110e8400-e29b-41d4-a716-446655440055\");",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "id": "a9cd878c-90e3-7903-7d68-cea06478e9a8",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwtToken}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/requests/550e8400-e29b-41d4-a716-446655440022/offers"
-          },
-          "response": [],
-          "createdAt": "2026-07-05T09:40:02.000Z",
-          "updatedAt": "2026-07-05T09:47:30.000Z",
-          "uid": "50436078-a9cd878c-90e3-7903-7d68-cea06478e9a8"
-        },
-        {
-          "name": "Get Offers - Negative (Invalid UUID format)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 400\", function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "pm.test(\"Highlights invalid requestId parameter\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.errors[0].field).to.eql(\"requestId\");",
-                  "});"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ],
-          "id": "af9d8bd0-6d7c-f5c5-8934-bedb65df3520",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "value": "Bearer {{jwtToken}}",
-                "key": "Authorization"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/requests/not-a-uuid/offers"
-          },
-          "response": [],
-          "createdAt": "2026-07-05T09:40:06.000Z",
-          "updatedAt": "2026-07-05T09:40:06.000Z",
-          "uid": "50436078-af9d8bd0-6d7c-f5c5-8934-bedb65df3520"
-        },
-        {
-          "name": "Get Offers - Negative (Non-existent request)",
-          "event": [
-            {
-              "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 404\", function () {",
-                  "    pm.response.to.have.status(404);",
-                  "});",
-                  "pm.test(\"Response says request not found\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.message).to.include(\"not found\");",
-                  "});"
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns list of offers', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; pm.expect(json.data).to.be.an('array'); });"
                 ]
-              },
-              "listen": "test"
+              }
             }
-          ],
-          "id": "0f6ba563-cd87-9554-1e32-16d6b97ed0e7",
+          ]
+        },
+        {
+          "name": "Get Offers - Negative (Not Found)",
           "request": {
             "method": "GET",
             "header": [
@@ -2082,155 +2003,22 @@
                 "value": "Bearer {{jwtToken}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
             "url": "{{baseUrl}}/api/requests/00000000-0000-0000-0000-000000000000/offers"
           },
-          "response": [],
-          "createdAt": "2026-07-05T09:40:13.000Z",
-          "updatedAt": "2026-07-05T09:40:13.000Z",
-          "uid": "50436078-0f6ba563-cd87-9554-1e32-16d6b97ed0e7"
-        },
-        {
-          "name": "Get Offers - Negative (Forbidden)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 403\", function () {",
-                  "    pm.response.to.have.status(403);",
-                  "});",
-                  "pm.test(\"Response indicates forbidden\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.message).to.include(\"permission\");",
-                  "});"
+                  "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });"
                 ]
               }
             }
-          ],
-          "id": "c226727f-ba81-ee1b-e8ae-3b37f0bd26e3",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwtToken}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/requests/38cbe690-3fcc-4b63-a245-719114206b45/offers"
-          },
-          "response": [],
-          "createdAt": "2026-07-05T09:40:16.000Z",
-          "updatedAt": "2026-07-05T09:40:16.000Z",
-          "uid": "50436078-c226727f-ba81-ee1b-e8ae-3b37f0bd26e3"
-        },
-        {
-          "name": "Get Offers - Negative (Unauthorized)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 401\", function () {",
-                  "    pm.response.to.have.status(401);",
-                  "});",
-                  "pm.test(\"Response is unauthorized\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "});"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ],
-          "id": "fda8c720-55fd-7dc1-c28d-a945e167a1d4",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/requests/550e8400-e29b-41d4-a716-446655440022/offers"
-          },
-          "response": [],
-          "createdAt": "2026-07-05T09:40:20.000Z",
-          "updatedAt": "2026-07-05T09:40:20.000Z",
-          "uid": "50436078-fda8c720-55fd-7dc1-c28d-a945e167a1d4"
+          ]
         },
         {
           "name": "Accept Offer - Positive",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test(\"Offer accepted and order created\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.data).to.be.an(\"object\");",
-                  "    pm.expect(jsonData.data.state).to.eql(\"accepted\");",
-                  "    pm.expect(jsonData.data.offer_id).to.eql(pm.environment.get(\"testOfferIdAccept\"));",
-                  "    pm.environment.set(\"testOrderIdFund\", jsonData.data.id);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ],
-          "id": "5cea0ae5-0351-554e-8a1e-cdf9af7e541c",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "value": "Bearer {{jwtToken}}",
-                "key": "Authorization"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/offers/{{testOfferIdAccept}}/accept"
-          },
-          "response": [],
-          "createdAt": "2026-07-05T09:42:30.000Z",
-          "updatedAt": "2026-07-05T09:42:30.000Z",
-          "uid": "50436078-5cea0ae5-0351-554e-8a1e-cdf9af7e541c"
-        },
-        {
-          "name": "Accept Offer - Negative (Already accepted)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 400\", function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "pm.test(\"Response indicates offer already processed\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.message).to.include(\"already accepted\");",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "id": "a3d3c33a-7ea3-0293-e83c-bfa822c1e6f3",
           "request": {
             "method": "POST",
             "header": [
@@ -2239,38 +2027,23 @@
                 "value": "Bearer {{jwtToken}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/offers/{{testOfferIdAccept}}/accept"
+            "url": "{{baseUrl}}/api/offers/110e8400-e29b-41d4-a716-446655440033/accept"
           },
-          "response": [],
-          "createdAt": "2026-07-05T09:42:36.000Z",
-          "updatedAt": "2026-07-05T09:42:39.000Z",
-          "uid": "50436078-a3d3c33a-7ea3-0293-e83c-bfa822c1e6f3"
-        },
-        {
-          "name": "Accept Offer - Negative (Invalid UUID format)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 400\", function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "pm.test(\"Highlights invalid offerId parameter\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.errors[0].field).to.eql(\"offerId\");",
-                  "});"
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Offer accepted successfully', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; });"
                 ]
               }
             }
-          ],
-          "id": "1869b3d7-5168-7e51-5755-0fca81d309cf",
+          ]
+        },
+        {
+          "name": "Accept Offer - Negative (Already Accepted)",
           "request": {
             "method": "POST",
             "header": [
@@ -2279,152 +2052,22 @@
                 "value": "Bearer {{jwtToken}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/offers/not-a-uuid/accept"
+            "url": "{{baseUrl}}/api/offers/110e8400-e29b-41d4-a716-446655440033/accept"
           },
-          "response": [],
-          "createdAt": "2026-07-05T09:42:42.000Z",
-          "updatedAt": "2026-07-05T09:42:42.000Z",
-          "uid": "50436078-1869b3d7-5168-7e51-5755-0fca81d309cf"
-        },
-        {
-          "name": "Accept Offer - Negative (Non-existent offer)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 404\", function () {",
-                  "    pm.response.to.have.status(404);",
-                  "});",
-                  "pm.test(\"Response says offer not found\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.message).to.include(\"not found\");",
-                  "});"
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
                 ]
               }
             }
-          ],
-          "id": "dc97c891-fa39-0d05-5465-cb553f1b3a4d",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwtToken}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/offers/00000000-0000-0000-0000-000000000000/accept"
-          },
-          "response": [],
-          "createdAt": "2026-07-05T09:42:46.000Z",
-          "updatedAt": "2026-07-05T09:42:46.000Z",
-          "uid": "50436078-dc97c891-fa39-0d05-5465-cb553f1b3a4d"
-        },
-        {
-          "name": "Accept Offer - Negative (Forbidden)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 403\", function () {",
-                  "    pm.response.to.have.status(403);",
-                  "});",
-                  "pm.test(\"Response indicates forbidden\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.message).to.include(\"permission\");",
-                  "});"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ],
-          "id": "9861590f-1bd3-405b-c205-647800322701",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "value": "Bearer {{jwtToken}}",
-                "key": "Authorization"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/offers/ae5de4a1-ffc4-42c4-9a65-debbb455953e/accept"
-          },
-          "response": [],
-          "createdAt": "2026-07-05T09:42:49.000Z",
-          "updatedAt": "2026-07-05T09:42:49.000Z",
-          "uid": "50436078-9861590f-1bd3-405b-c205-647800322701"
-        },
-        {
-          "name": "Accept Offer - Negative (Unauthorized)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 401\", function () {",
-                  "    pm.response.to.have.status(401);",
-                  "});",
-                  "pm.test(\"Response is unauthorized\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "id": "8a9c919b-4db7-c954-8bc9-8847bc11204b",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/offers/{{testOfferIdAccept}}/accept"
-          },
-          "response": [],
-          "createdAt": "2026-07-05T09:42:52.000Z",
-          "updatedAt": "2026-07-05T09:42:52.000Z",
-          "uid": "50436078-8a9c919b-4db7-c954-8bc9-8847bc11204b"
+          ]
         },
         {
           "name": "Decline Offer - Positive",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test(\"Offer declined successfully\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.message).to.include(\"declined\");",
-                  "});"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ],
-          "id": "a4c254e5-1f80-cfe0-d76b-8edf4368c286",
           "request": {
             "method": "POST",
             "header": [
@@ -2433,158 +2076,23 @@
                 "value": "Bearer {{jwtToken}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/offers/{{testOfferIdDecline}}/decline"
+            "url": "{{baseUrl}}/api/offers/110e8400-e29b-41d4-a716-446655440055/decline"
           },
-          "response": [],
-          "createdAt": "2026-07-05T09:45:44.000Z",
-          "updatedAt": "2026-07-05T09:45:44.000Z",
-          "uid": "50436078-a4c254e5-1f80-cfe0-d76b-8edf4368c286"
-        },
-        {
-          "name": "Decline Offer - Negative (Already declined)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 400\", function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "pm.test(\"Response indicates offer already processed\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.message).to.include(\"already accepted\");",
-                  "});"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ],
-          "id": "a64c324a-c120-aac8-ef63-0f30dcbf365e",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "value": "Bearer {{jwtToken}}",
-                "key": "Authorization"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/offers/{{testOfferIdDecline}}/decline"
-          },
-          "response": [],
-          "createdAt": "2026-07-05T09:45:47.000Z",
-          "updatedAt": "2026-07-05T09:45:51.000Z",
-          "uid": "50436078-a64c324a-c120-aac8-ef63-0f30dcbf365e"
-        },
-        {
-          "name": "Decline Offer - Negative (Invalid UUID format)",
           "event": [
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 400\", function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "pm.test(\"Highlights invalid offerId parameter\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.errors[0].field).to.eql(\"offerId\");",
-                  "});"
-                ],
-                "type": "text/javascript"
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Offer declined successfully', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; });"
+                ]
               }
             }
-          ],
-          "id": "4c908920-e7ac-d395-d512-97b6e32f1001",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "value": "Bearer {{jwtToken}}",
-                "key": "Authorization"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/offers/not-a-uuid/decline"
-          },
-          "response": [],
-          "createdAt": "2026-07-05T09:45:55.000Z",
-          "updatedAt": "2026-07-05T09:45:55.000Z",
-          "uid": "50436078-4c908920-e7ac-d395-d512-97b6e32f1001"
+          ]
         },
         {
-          "name": "Decline Offer - Negative (Non-existent offer)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 404\", function () {",
-                  "    pm.response.to.have.status(404);",
-                  "});",
-                  "pm.test(\"Response says offer not found\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.message).to.include(\"not found\");",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "id": "aa42f83f-ee25-9a10-ba8f-f4dad9a27775",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "value": "Bearer {{jwtToken}}",
-                "key": "Authorization"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/offers/00000000-0000-0000-0000-000000000000/decline"
-          },
-          "response": [],
-          "createdAt": "2026-07-05T09:45:59.000Z",
-          "updatedAt": "2026-07-05T09:45:59.000Z",
-          "uid": "50436078-aa42f83f-ee25-9a10-ba8f-f4dad9a27775"
-        },
-        {
-          "name": "Decline Offer - Negative (Forbidden)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 403\", function () {",
-                  "    pm.response.to.have.status(403);",
-                  "});",
-                  "pm.test(\"Response indicates forbidden\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.message).to.include(\"permission\");",
-                  "});"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ],
-          "id": "143932ca-777d-1cd3-099b-c0041e0cfc53",
+          "name": "Decline Offer - Negative (Already Declined)",
           "request": {
             "method": "POST",
             "header": [
@@ -2593,50 +2101,19 @@
                 "value": "Bearer {{jwtToken}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/offers/ae5de4a1-ffc4-42c4-9a65-debbb455953e/decline"
+            "url": "{{baseUrl}}/api/offers/110e8400-e29b-41d4-a716-446655440055/decline"
           },
-          "response": [],
-          "createdAt": "2026-07-05T09:46:02.000Z",
-          "updatedAt": "2026-07-05T09:46:02.000Z",
-          "uid": "50436078-143932ca-777d-1cd3-099b-c0041e0cfc53"
-        },
-        {
-          "name": "Decline Offer - Negative (Unauthorized)",
           "event": [
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 401\", function () {",
-                  "    pm.response.to.have.status(401);",
-                  "});",
-                  "pm.test(\"Response is unauthorized\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "});"
-                ],
-                "type": "text/javascript"
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
+                ]
               }
             }
-          ],
-          "id": "83f86105-f8b4-6088-05e2-1f966b03061f",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": "{{baseUrl}}/api/offers/{{testOfferIdDecline}}/decline"
-          },
-          "response": [],
-          "createdAt": "2026-07-05T09:46:06.000Z",
-          "updatedAt": "2026-07-05T09:46:06.000Z",
-          "uid": "50436078-83f86105-f8b4-6088-05e2-1f966b03061f"
+          ]
         }
       ],
       "id": "8a1a43ff-468e-439c-9bf9-91b8b488f847",
@@ -2646,58 +2123,668 @@
     },
     {
       "name": "Orders",
-      "item": [],
+      "item": [
+        {
+          "name": "Get Buyer Orders - Positive",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns list of orders', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; pm.expect(json.data).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Buyer Orders - Negative (Unauthorized)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/buyers/{{buyerId}}/orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 401', function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Order by ID - Positive",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440099"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns order details', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; pm.expect(json.data.id).to.eql('550e8400-e29b-41d4-a716-446655440099'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Order by ID - Negative (Not Found)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/00000000-0000-0000-0000-000000000000"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        }
+      ],
       "id": "b198038f-ae5c-4e03-bca9-08fafb9e895f",
       "createdAt": "2026-07-03T16:12:19.000Z",
-      "updatedAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-27T17:44:00.000Z",
       "uid": "50436078-b198038f-ae5c-4e03-bca9-08fafb9e895f"
     },
     {
       "name": "Payments",
-      "item": [],
+      "item": [
+        {
+          "name": "Fund Escrow - Positive",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"gateway_reference\":\"PAY-ESCROW-REF-100\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440088/payment"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Escrow funded successfully', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; pm.expect(json.message).to.include('funded'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Fund Escrow - Negative (Missing Gateway Ref)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440088/payment"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Payment - Positive",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440099/payment"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns payment data', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; pm.expect(json.data.order_id).to.eql('550e8400-e29b-41d4-a716-446655440099'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ],
       "id": "68b64931-a436-476a-88ad-c505e57d904f",
       "createdAt": "2026-07-03T16:12:19.000Z",
-      "updatedAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-27T17:50:02.000Z",
       "uid": "50436078-68b64931-a436-476a-88ad-c505e57d904f"
     },
     {
       "name": "Milestones",
-      "item": [],
+      "item": [
+        {
+          "name": "Get Order Milestones - Positive",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440099/milestones"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns milestone array', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; pm.expect(json.data).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Order Milestones - Negative (Unauthorized)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440099/milestones"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 401', function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        }
+      ],
       "id": "3cc8aeb5-d7ec-4ff5-aef6-d6af2329b702",
       "createdAt": "2026-07-03T16:12:19.000Z",
-      "updatedAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-27T17:52:59.000Z",
       "uid": "50436078-3cc8aeb5-d7ec-4ff5-aef6-d6af2329b702"
     },
     {
       "name": "Proof",
-      "item": [],
+      "item": [
+        {
+          "name": "Get Proof - Positive",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440077/proof"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns proof details', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; pm.expect(json.data.approval_status).to.eql('pending'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Approve Proof - Positive",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440077/proof/880e8400-e29b-41d4-a716-446655440001/approve"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Proof approved message', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; pm.expect(json.message).to.include('approved'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject Proof - Positive",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rejection_reason\":\"Images are incomplete and blurry. Please resubmit clear photos.\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440066/proof/880e8400-e29b-41d4-a716-446655440002/reject"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Proof rejected message', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; pm.expect(json.message).to.include('rejected'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject Proof - Negative (Reason Too Short)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rejection_reason\":\"bad\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440066/proof/880e8400-e29b-41d4-a716-446655440002/reject"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        }
+      ],
       "id": "6401dff8-c05e-4801-abc2-e9927f4af994",
       "createdAt": "2026-07-03T16:12:19.000Z",
-      "updatedAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-27T18:02:22.000Z",
       "uid": "50436078-6401dff8-c05e-4801-abc2-e9927f4af994"
     },
     {
       "name": "Messages",
-      "item": [],
+      "item": [
+        {
+          "name": "Get Order Messages - Positive",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440099/messages"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns message list', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; pm.expect(json.data).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Send Message - Positive",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"content\":\"Hello expert, when will the service be completed?\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440099/messages"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Returns sent message', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; pm.expect(json.data.content).to.include('completed'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Send Message - Negative (Empty Content)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"content\":\"\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440099/messages"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        }
+      ],
       "id": "30e5224a-c345-41a0-8140-5b9b9c53610a",
       "createdAt": "2026-07-03T16:12:19.000Z",
-      "updatedAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-27T18:10:06.000Z",
       "uid": "50436078-30e5224a-c345-41a0-8140-5b9b9c53610a"
     },
     {
       "name": "Attachments",
-      "item": [],
+      "item": [
+        {
+          "name": "Get Order Attachments - Positive",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440099/attachments"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns attachment list', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; pm.expect(json.data).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Order Attachments - Negative (Unauthorized)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440099/attachments"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 401', function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        }
+      ],
       "id": "4f3d1bca-be12-4da7-abec-f6415b2f18d6",
       "createdAt": "2026-07-03T16:12:19.000Z",
-      "updatedAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-27T18:13:13.000Z",
       "uid": "50436078-4f3d1bca-be12-4da7-abec-f6415b2f18d6"
     },
     {
       "name": "Reviews",
-      "item": [],
+      "item": [
+        {
+          "name": "Submit Review - Positive",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rating\":5,\"comment\":\"Outstanding service! Fast and professional.\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440055/review"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Review submitted', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; pm.expect(json.data.rating).to.eql(5); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit Review - Negative (Invalid Rating)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rating\":10,\"comment\":\"Invalid rating test\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440055/review"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Order Review - Positive",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/550e8400-e29b-41d4-a716-446655440055/review"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns review data', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; pm.expect(json.data.rating).to.eql(5); });"
+                ]
+              }
+            }
+          ]
+        }
+      ],
       "id": "83ebb44e-5e46-481e-bdf6-1a8e2cdef2ca",
       "createdAt": "2026-07-03T16:12:19.000Z",
-      "updatedAt": "2026-07-03T16:12:19.000Z",
+      "updatedAt": "2026-07-27T18:18:41.000Z",
       "uid": "50436078-83ebb44e-5e46-481e-bdf6-1a8e2cdef2ca"
     },
     {
@@ -3342,20 +3429,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status code is 201', function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});",
-                  "pm.test('Response indicates report submitted', function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.message).to.include('submitted');",
-                  "});",
-                  "pm.test('Response data has report fields', function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.have.property('id');",
-                  "    pm.expect(jsonData.data.status).to.eql('open');",
-                  "    pm.expect(jsonData.data.category).to.eql('fake_proof');",
-                  "});"
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Response indicates report submitted', function () { const json = pm.response.json(); pm.expect(json.success).to.be.true; });"
                 ]
               }
             }
@@ -3392,185 +3467,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status code is 400', function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "pm.test('Validation error on order_id', function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.errors[0].field).to.eql('order_id');",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "File Report - Negative (Invalid Role)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwtToken}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"order_id\": \"550e8400-e29b-41d4-a716-446655440099\",\n  \"reported_user_id\": \"ca9a80ff-0b83-4dca-975d-6c10c20808d9\",\n  \"reported_role\": \"admin\",\n  \"category\": \"fraud\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": "{{baseUrl}}/api/reports"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status code is 400', function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "pm.test('Validation error on reported_role', function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.errors[0].field).to.eql('reported_role');",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "File Report - Negative (Invalid Category)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwtToken}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"order_id\": \"550e8400-e29b-41d4-a716-446655440099\",\n  \"reported_user_id\": \"ca9a80ff-0b83-4dca-975d-6c10c20808d9\",\n  \"reported_role\": \"expert\",\n  \"category\": \"spam\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": "{{baseUrl}}/api/reports"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status code is 400', function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "pm.test('Validation error on category', function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.errors[0].field).to.eql('category');",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "File Report - Negative (Non-existent Order)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwtToken}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"order_id\": \"00000000-0000-0000-0000-000000000000\",\n  \"reported_user_id\": \"ca9a80ff-0b83-4dca-975d-6c10c20808d9\",\n  \"reported_role\": \"expert\",\n  \"category\": \"fraud\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": "{{baseUrl}}/api/reports"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status code is 404', function () {",
-                  "    pm.response.to.have.status(404);",
-                  "});",
-                  "pm.test('Response says order not found', function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.message).to.include('order not found');",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "File Report - Negative (Unauthorized)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"order_id\": \"550e8400-e29b-41d4-a716-446655440099\",\n  \"reported_user_id\": \"ca9a80ff-0b83-4dca-975d-6c10c20808d9\",\n  \"reported_role\": \"expert\",\n  \"category\": \"fraud\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": "{{baseUrl}}/api/reports"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status code is 401', function () {",
-                  "    pm.response.to.have.status(401);",
-                  "});",
-                  "pm.test('Response indicates unauthorized', function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "});"
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
                 ]
               }
             }
@@ -3579,7 +3476,7 @@
       ],
       "id": "66587975-ff38-4eb6-9ca8-f2aa0c4849e9",
       "createdAt": "2026-07-03T16:12:19.000Z",
-      "updatedAt": "2026-07-05T08:46:51.000Z",
+      "updatedAt": "2026-07-27T18:28:23.000Z",
       "uid": "50436078-66587975-ff38-4eb6-9ca8-f2aa0c4849e9"
     },
     {
