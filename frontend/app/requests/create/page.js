@@ -69,7 +69,7 @@ export default function CreateRequestPage() {
       city_id: CITIES[0].value,
       description: '',
       budget: 5000,
-      timeline: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
+      timeline: '2026-08-25',
       item_links: '',
     },
   });

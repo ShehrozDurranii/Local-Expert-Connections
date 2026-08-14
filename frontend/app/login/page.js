@@ -114,7 +114,7 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 pt-6 border-t border-border text-center text-sm text-text-secondary">
-          Don't have a buyer account?{' '}
+          Don&apos;t have a buyer account?{' '}
           <Link href="/register" className="font-semibold text-primary hover:underline">
             Register now
           </Link>

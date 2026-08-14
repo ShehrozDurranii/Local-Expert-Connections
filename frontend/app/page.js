@@ -229,7 +229,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {TESTIMONIALS.map((t, i) => (
               <div key={i} className="p-6 rounded-xl bg-background-secondary border border-border">
-                <p className="text-sm text-text-secondary italic mb-4">"{t.quote}"</p>
+                <p className="text-sm text-text-secondary italic mb-4">&quot;{t.quote}&quot;</p>
                 <div className="font-semibold text-text-primary text-sm">{t.author}</div>
                 <div className="text-xs text-text-muted">{t.role}</div>
               </div>
