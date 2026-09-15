@@ -1,5 +1,6 @@
 node_modules/
 backend/.env
+backend/ca.pem
 .env.local
 
 .next/
