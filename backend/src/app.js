@@ -43,14 +43,14 @@ app.use('/api', reportRoutes);
 app.use('/api', requestRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-module.exports = app;
-
+// Database connection verification (non-blocking, won't crash on failure)
 const db = require('./config/database');
-
 db.query('SELECT 1')
   .then(() => {
     console.log('Database connected successfully');
   })
   .catch((err) => {
-    console.log('Database connection failed', err);
+    console.log('Database connection failed', err.message);
   });
+
+module.exports = app;
