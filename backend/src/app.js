@@ -24,6 +24,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) =>
+  res.json({ status: 'ok', message: 'Local Expert Connect Backend API is live and running' })
+);
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 app.use('/api/buyers', authRoutes);
