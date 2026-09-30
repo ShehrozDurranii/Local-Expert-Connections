@@ -4,9 +4,16 @@ const multer = require('multer');
 const attachmentService = require('../services/attachment.service');
 
 // Configure storage for multer
-const uploadDir = path.join(__dirname, '../../uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+// Use /tmp on serverless (Vercel) since the main filesystem is read-only
+const uploadDir = process.env.VERCEL
+  ? path.join('/tmp', 'uploads')
+  : path.join(__dirname, '../../uploads');
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch {
+  // Silently ignore on read-only filesystems
 }
 
 const storage = multer.diskStorage({
