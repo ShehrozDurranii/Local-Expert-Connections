@@ -41,8 +41,15 @@ exports.register = async (data) => {
     errors.push({ field: 'email', message: 'Email must be a valid email address' });
   }
 
-  if (phone && !/^\+92[0-9]{10}$/.test(phone)) {
-    errors.push({ field: 'phone', message: 'Phone number must match format +92XXXXXXXXXX' });
+  if (phone) {
+    const cleanPhone = phone.replace(/[\s\-()]/g, '');
+    if (!/^\+?[0-9]{10,15}$/.test(cleanPhone)) {
+      errors.push({
+        field: 'phone',
+        message:
+          'Phone number must be a valid 10-15 digit number (e.g. +923001234567 or 03001234567)',
+      });
+    }
   }
 
   if (!password || password.length < 8) {

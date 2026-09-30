@@ -69,6 +69,7 @@ export default function RegisterPage() {
       }
     } catch (err) {
       const errorMsg =
+        err.response?.data?.errors?.[0]?.message ||
         err.response?.data?.message ||
         err.message ||
         'Registration failed. Please check your details.';

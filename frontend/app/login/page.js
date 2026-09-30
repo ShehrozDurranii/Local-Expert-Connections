@@ -61,6 +61,7 @@ export default function LoginPage() {
       }
     } catch (err) {
       const errorMsg =
+        err.response?.data?.errors?.[0]?.message ||
         err.response?.data?.message ||
         err.message ||
         'Login failed. Please check your credentials.';
